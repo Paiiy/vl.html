@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will you be my Valentine?</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Dancing+Script:wght@700&display=swap');
+
+        body {
+            background: linear-gradient(to bottom right, #ff9a9e, #fecfef, #fad0c4);
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #333;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #musicToggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        #musicToggle:hover {
+            transform: scale(1.1);
+        }
+
+        .bg-heart {
+            position: absolute;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.3);
+            animation: float-up 10s linear infinite;
+        }
+
+        @keyframes float-up {
+            0% { bottom: -50px; opacity: 0; transform: translateX(0) rotate(0deg); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { bottom: 110%; opacity: 0; transform: translateX(100px) rotate(360deg); }
+        }
+
+        .container {
+            text-align: center;
+            z-index: 10;
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 40px 60px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+
+        .container.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .question-gif {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 3rem;
+            justify-content: center;
+            align-items: center;
+            height: 60px;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            border: 2px solid;
+            border-radius: 50px;
+            cursor: pointer;
+            background-color: transparent;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            min-width: 120px;
+        }
+
+        #yesBtn {
+            border-color: #4CAF50;
+            color: #4CAF50;
+            transform: scale(1);
+        }
+
+        #yesBtn:hover {
+            background-color: #4CAF50;
+            color: #ffffff;
+        }
+
+        #noBtn {
+            border-color: #e91e63;
+            color: #e91e63;
+            transform: scale(1);
+        }
+
+        #noBtn:hover {
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .success-message {
+            position: absolute;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        .success-message.show {
+            opacity: 1;
+        }
+
+        .success-message h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 4rem;
+            color: #e91e63;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .success-gif {
+            width: 250px;
+            height: 250px;
+            border-radius: 20px;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            object-fit: cover;
+        }
+
+        .success-message p {
+            font-size: 1.5rem;
+            color: #555;
+        }
+
+        .heart-burst {
+            font-size: 2rem;
+            position: absolute;
+            animation: burst-float 2s ease-out forwards;
+        }
+        
+        @keyframes burst-float {
+            to {
+                transform: translateY(-150px) scale(1.5) rotate(15deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="musicToggle">🎵</div>
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="container" id="mainContainer">
+        <h1 id="questionTitle">Will you be my Valentine?</h1>
+        <img src="gif1.gif" alt="Pertanyaan" class="question-gif" id="questionGif">
+        
+        <div class="buttons">
+            <button id="yesBtn">Yes</button>
+            <button id="noBtn">No</button>
+        </div>
+    </div>
+
+    <div class="success-message" id="successMessage">
+        <h2>Yayyy!!! Happy Valentine Day Cherylll!!!</h2>
+        <img src="Turning Hugging Sticker - Turning Hugging - Discover & Share GIFs.gif" alt="Jawaban" class="success-gif">
+        <p></p>
+    </div>
+
+    <script>
+        const yesBtn = document.getElementById('yesBtn');
+        const noBtn = document.getElementById('noBtn');
+        const mainContainer = document.getElementById('mainContainer');
+        const successMessage = document.getElementById('successMessage');
+        const body = document.body;
+        const questionGif = document.getElementById('questionGif');
+        const questionTitle = document.getElementById('questionTitle');
+
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggle = document.getElementById('musicToggle');
+        let musicPlaying = false;
+
+        const noGifs = ['gif1.gif', 'gif2.gif', 'gif3.gif'];
+        const questionTexts = [
+            "Will you be my Valentine?",
+            "Are you sure about that?",
+            "Please think again",
+            "Last chance! Say yes!"
+        ];
+
+        let noClickCount = 0;
+        let noScale = 1;
+        let yesScale = 1;
+
+        function createBackgroundHearts() {
+            const heartSymbols = ['❤️', '💕', '💖', '💗', '💝'];
+            setInterval(() => {
+                const heart = document.createElement('div');
+                heart.classList.add('bg-heart');
+                heart.textContent = heartSymbols[Math.floor(Math.random() * heartSymbols.length)];
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.animationDuration = `${Math.random() * 3 + 7}s`;
+                heart.style.opacity = Math.random() * 0.5 + 0.2;
+                body.appendChild(heart);
+                heart.addEventListener('animationend', () => heart.remove());
+            }, 300);
+        }
+
+        noBtn.addEventListener('click', () => {
+            noClickCount++;
+            noScale *= 0.85;
+            yesScale = 1 + (noClickCount * 0.2);
+
+            noBtn.style.transform = `scale(${noScale})`;
+            yesBtn.style.transform = `scale(${yesScale})`;
+
+            // --- PERUBAHAN DIMULAI DI SINI ---
+            // Hanya ganti GIF dan teks sampai klik ke-3.
+            // Setelah itu, kondisi 'if' tidak akan terpenuhi lagi, jadi GIF dan teks locked.
+            if (noClickCount <= noGifs.length) {
+                const nextGifIndex = noClickCount - 1;
+                questionGif.src = noGifs[nextGifIndex];
+
+                if (noClickCount < questionTexts.length) {
+                    questionTitle.textContent = questionTexts[noClickCount];
+                }
+            }
+            // --- PERUBAHAN SELESAI ---
+
+            if (noClickCount === 1) {
+                yesBtn.textContent = "Yes";
+            } else if (noClickCount === 2) {
+                yesBtn.textContent = "Yes";
+            } else if (noClickCount >= 3) {
+                yesBtn.textContent = "Yes";
+            }
+        });
+
+        yesBtn.addEventListener('click', () => {
+            mainContainer.classList.add('hidden');
+            setTimeout(() => {
+                successMessage.classList.add('show');
+                createHeartBurst();
+            }, 500);
+        });
+
+        musicToggle.addEventListener('click', () => {
+            if (musicPlaying) {
+                bgMusic.pause();
+                musicToggle.textContent = '🎵';
+            } else {
+                bgMusic.play().then(() => {
+                    musicToggle.textContent = '🔇';
+                }).catch(error => {
+                    console.log("Autoplay diblokir browser. Klik tombol lagi untuk memutar.");
+                });
+            }
+            musicPlaying = !musicPlaying;
+        });
+
+        function createHeartBurst() {
+            const hearts = ['❤️', '💖', '💗', '💝', '✨', '🥰'];
+            const numberOfHearts = 25;
+            for (let i = 0; i < numberOfHearts; i++) {
+                setTimeout(() => {
+                    const heart = document.createElement('div');
+                    heart.classList.add('heart-burst');
+                    heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                    const x = (window.innerWidth / 2) + (Math.random() - 0.5) * 300;
+                    const y = (window.innerHeight / 2);
+                    heart.style.left = `${x}px`;
+                    heart.style.top = `${y}px`;
+                    body.appendChild(heart);
+                    heart.addEventListener('animationend', () => heart.remove());
+                }, i * 50);
+            }
+        }
+
+        createBackgroundHearts();
+
+        document.addEventListener('click', () => {
+            if (!musicPlaying) {
+                bgMusic.play().then(() => {
+                    musicPlaying = true;
+                    musicToggle.textContent = '🔇';
+                }).catch(e => console.log("Musik tidak bisa autoplay."));
+            }
+        }, { once: true });
+
+    </script>
+
+</body>
+</html>
